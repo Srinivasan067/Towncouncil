@@ -94,7 +94,7 @@ module.exports = {
   getworkOrderTransaction: async (callback) => {
     try {
       const request = model.db.request();
-      let query = `select m* from WorkOrderTransaction`;
+      let query = `select * from WorkOrderTransaction`;
       const response = await request.query(query);
       return callback(null, response.recordset);
     }
