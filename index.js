@@ -26,7 +26,7 @@ app.use('/workTransaction',workOrderTransaction);
 
 
 
-const port = process.env.PORT;
+const port = 3001;
 
 app.listen(port,()=>{
     console.log(`server is running on port ${port}`)
