@@ -30,7 +30,7 @@ app.use('/workTransaction',workOrderTransaction);
 
 
 
-const port = 443;
+const port = 80;
 
 app.listen(port,()=>{
     console.log(`server is running on port ${port}`)
