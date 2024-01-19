@@ -1,4 +1,4 @@
-const { createWorkOrder, orderImage, getAllWorkOrder, getAllworkOrderTransaction } = require('./WorkerOrder.services')
+const { createWorkOrder, orderImage, getAllWorkOrder, getAllworkOrderTransaction , getworkOrderTransaction} = require('./WorkerOrder.services')
 module.exports = {
     createWorkOrder: (req, res) => {
         const body = req.body
@@ -84,5 +84,26 @@ module.exports = {
         })
 
     },
+
+    getWorkOrderTransaction: (req, res) => {
+        getworkOrderTransaction((err, result) => {
+            if (err) {
+                console.log(err)
+                res.status(500).json({
+                    success: 0,
+                    message: "Interal Server Error"
+                })
+            }
+           
+                return res.status(200).json({
+                    success: 1,
+                    data: result
+                })
+        
+           
+        })
+
+    },
+
 
 }
