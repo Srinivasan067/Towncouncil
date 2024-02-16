@@ -21,7 +21,7 @@ module.exports ={
     },
     getuserByLoginID : async (data, callback)=>{
         try{
-            let query = `select * from AdminLogin where LoginName=@LoginName`
+            let query = `select * from UserMaster where UserName=@LoginName`
             const request =model.db.request();
             request.input('LoginName',data.LoginName)
 

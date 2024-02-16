@@ -25,6 +25,7 @@ module.exports = {
     },
     login: (req, res) => {
         const body = req.body;
+
         getuserByLoginID(body, (err, result) => {
             if (err) {
                 // console.log("err",err)
@@ -42,8 +43,9 @@ module.exports = {
                         success: 1,
                         message: "login Successfull",
                         token: token,
-                        user_id:result.AdminID,
-                        name : result.LoginName
+                        user_id:result.UserRole,
+                        name : result.UserName,
+                        AdminID :result.AdminID,
                     })
                 }
                 else {

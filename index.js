@@ -5,6 +5,7 @@ const dotenv =require('dotenv')
 const userRoutes = require('./src/user/user.routes');
 const imageRoute =require('./src/image/imageRoute');
 const workOrderTransaction = require('./src/WorkerOrderTransaction/WorkerOrder.routes');
+const timeManagement =require('./src/TimeManagement/TimeManagement.routes')
 dotenv.config();
 
 const app = express();
@@ -27,7 +28,7 @@ app.get('/',(req,res)=>{
 app.use('/user',userRoutes);
 app.use('/img', imageRoute);
 app.use('/workTransaction',workOrderTransaction);
-
+app.use('/timemanagement',timeManagement)
 
 
 const port = 3000;

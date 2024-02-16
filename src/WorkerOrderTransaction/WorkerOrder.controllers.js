@@ -5,7 +5,7 @@ module.exports = {
         // console.log(body)
         createWorkOrder(body, (err, result) => {
             if (err) {
-
+                    console.log("du",err)
                 if (err.message.startsWith("Violation of UNIQUE KEY constraint 'UQ__WorkOrde__AE7551141AD2709B'")) {
                     const duplicateKeyValue = err.message.match(/value is \(([^)]+)\)/)[1];
 
@@ -14,6 +14,7 @@ module.exports = {
                         message: `WorkId ${duplicateKeyValue} is Already Exist`
                     });
                 } else {
+                    console.log("re",err)
                     return res.status(500).json({
                         success: 0,
                         message: "Internal server Error"
