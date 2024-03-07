@@ -4,7 +4,6 @@ const body_parser =require('body-parser');
 const dotenv =require('dotenv')
 const userRoutes = require('./src/user/user.routes');
 const imageRoute =require('./src/image/imageRoute');
-const workOrderTransaction = require('./src/WorkerOrderTransaction/WorkerOrder.routes');
 const timeManagement =require('./src/TimeManagement/TimeManagement.routes')
 dotenv.config();
 
@@ -27,7 +26,6 @@ app.get('/',(req,res)=>{
 
 app.use('/user',userRoutes);
 app.use('/img', imageRoute);
-app.use('/workTransaction',workOrderTransaction);
 app.use('/timemanagement',timeManagement)
 
 

@@ -13,7 +13,7 @@ module.exports = {
                 //         message: `WorkId ${duplicateKeyValue} is Already Exist`
                 //     });
                 // } else {
-                console.log("err", err)
+                // console.log("err", err)
                 return res.status(500).json({
                     success: 0,
                     message: "Internal server Error"
@@ -29,7 +29,7 @@ module.exports = {
     getPhotoTypeId: (req, res) => {
         getPhotoTypeId((err, result) => {
             if (err) {
-                console.log(err)
+                // console.log(err)
                 res.status(500).json({
                     success: 0,
                     message: "Interal Server Error"
@@ -44,7 +44,7 @@ module.exports = {
     getProjectTypeMaster: (req, res) => {
         getProjectTypeMaster((err, result) => {
             if (err) {
-                console.log(err)
+                // console.log(err)
                 res.status(500).json({
                     success: 0,
                     message: "Interal Server Error"
@@ -60,7 +60,7 @@ module.exports = {
         const body = req.body
         createLogTimeSheetManageent(body, (err, result) => {
             if (err) {
-                console.log(err)
+                // console.log(err)
                 return res.status(500).json({
                     success: 0,
                     message: "Internal Server Error"
@@ -103,7 +103,7 @@ module.exports = {
         const body = req.body
         getbyId(body, (err, result) => {
             if (err) {
-                console.log(err)
+                // console.log(err)
                 return res.status(500).json({
                     success: 0,
                     message: "Internal Server Error"

@@ -17,7 +17,7 @@ module.exports = {
       const dateTime = data.image[0].dateTime
       const createBy = data.user_id
 
-      console.log(worker_id, projectTypeId, projectName, photoTypeId, path, latitude, longitude, dateTime)
+      // console.log(worker_id, projectTypeId, projectName, photoTypeId, path, latitude, longitude, dateTime)
 
       query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                       @workers_id,@projectTypeId,@projectName,@createBy
@@ -38,7 +38,7 @@ module.exports = {
 
       query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
       let response = await request.query(query);
-      console.log(response.recordset);
+      // console.log(response.recordset);
       const TimeSheetId = await response.recordset[0].TimeSheetId
       query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
         @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -109,17 +109,14 @@ module.exports = {
       let query = `SELECT * FROM TimeManagement tm 
               JOIN TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID 
               WHERE ts.WorkersId = @workersid 
-              AND CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE());`;
+              AND CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE()));`;
 
       request.input('workersid', sql.Int, worker_id);
       let response = await request.query(query);
 
       if (response.recordset && response.recordset.length > 0) {
-        console.log("record Found!")
+        // console.log("record Found!")
 
-        // query = `SELECT SYSDATETIMEOFFSET () AT TIME ZONE 'Singapore Standard Time' as time;`
-
-        // response = await request.query(query);
 
        
 
@@ -127,17 +124,17 @@ module.exports = {
 
         const currentHour = dateObject.getHours();
 
-        console.log(dateTime)
+        // console.log(dateTime)
 
         if (currentHour >= 8 && currentHour < 20) {
 
 
-          console.log("8 to 8 pm", worker_id);
+          // console.log("8 to 8 pm", worker_id);
 
           query = `SELECT ts.ProjectTypeId
           FROM dbo.TimeManagement tm
           JOIN dbo.TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID
-          WHERE  CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE())
+          WHERE  CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE()))
           AND  DatePART(HOUR,tm.EntryTime)BETWEEN 8 AND 20 and PhotoTypeId=1 and ts.WorkersId =${worker_id}`
 
 
@@ -151,17 +148,17 @@ module.exports = {
             startTimelength = response.recordset.length
             // console.log(startTimelength)
 
-            console.log("startime Exists", startTimelength)
+            // console.log("startime Exists", startTimelength)
 
             let projecttypeid = response.recordset[startTimelength - 1].ProjectTypeId
 
-            console.log(projecttypeid, projectTypeId)
+            // console.log(projecttypeid, projectTypeId)
 
             query = `SELECT ts.ProjectTypeId
             FROM dbo.TimeManagement tm
             JOIN dbo.TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID
             WHERE PhotoTypeId=2 and ts.WorkersId =${worker_id} 
-            and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE())
+            and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE,dateadd(hh,8,GETUTCDATE()))
             AND  DatePART(HOUR,tm.EntryTime)BETWEEN 8 AND 20`
 
 
@@ -169,10 +166,10 @@ module.exports = {
 
             if (response.recordset && response.recordset.length > 0) {
               EndTimeLength = response.recordset.length
-              console.log("endtime exists", EndTimeLength)
+              // console.log("endtime exists", EndTimeLength)
 
               if (startTimelength === EndTimeLength) {
-                console.log("even condition start time insert ")
+                // console.log("even condition start time insert ")
 
                 if (photoTypeId === 1) {
                   query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
@@ -188,7 +185,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                       @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -207,21 +204,21 @@ module.exports = {
 
                 }
                 else {
-                  console.log("Need start time to insert");
+                  // console.log("Need start time to insert");
                   return callback(null, "No Record");
                 }
 
               }
               else {
-                console.log("odd condition insert end time ")
+                // console.log("odd condition insert end time ")
                 if (projecttypeid != projectTypeId) {
-                  console.log("project not exists")
+                  // console.log("project not exists")
                   return callback(null, "project not Exists")
                 }
                 else {
-                  console.log("Project exists")
+                  // console.log("Project exists")
                   if (photoTypeId == 3) {
-                    console.log("location change")
+                    // console.log("location change")
                     query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                       @workers_id,@projectTypeId,@projectName,@createBy
                   )`;
@@ -235,7 +232,7 @@ module.exports = {
 
                     query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                     let response = await request.query(query);
-                    console.log(response.recordset);
+                    // console.log(response.recordset);
                     const TimeSheetId = await response.recordset[0].TimeSheetId
                     query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                       @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -266,7 +263,7 @@ module.exports = {
 
                     query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                     let response = await request.query(query);
-                    console.log(response.recordset);
+                    // console.log(response.recordset);
                     const TimeSheetId = await response.recordset[0].TimeSheetId
                     query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                       @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -285,20 +282,20 @@ module.exports = {
 
                   }
                   else {
-                    console.log("Need start time to insert");
+                    // console.log("Need start time to insert");
                     return callback(null, "Record exists");
                   }
                 }
               }
             }
             else {
-              console.log("endtime not exists");
+              // console.log("endtime not exists");
               if (projecttypeid != projectTypeId) {
-                console.log("project not exists")
+                // console.log("project not exists")
                 return callback(null, "project not Exists")
               }
               else {
-                console.log("Project exists")
+                // console.log("Project exists")
                 if (photoTypeId === 3) {
                   query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                     @workers_id,@projectTypeId,@projectName,@createBy
@@ -313,7 +310,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                     @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -345,7 +342,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                     @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -364,28 +361,65 @@ module.exports = {
 
                 }
                 else {
-                  console.log("Need start time to insert");
+                  // console.log("Need start time to insert");
                   return callback(null, "Record exists");
                 }
               }
             }
           }
+          // return callback(null, "Time issuse");
           else {
-            console.log("no start time Exists")  // insert 
-            return callback(null, "Time issuse");
-
+            // console.log("no start time Exists")   
+            // console.log(" No Record ! if ph 1 insert")
+            if (photoTypeId === 1) {
+              query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
+                @workers_id,@projectTypeId,@projectName,@createBy
+            )`;
+              request
+                .input('workers_id', sql.Int, worker_id)
+                .input('projectTypeId', sql.Int, projectTypeId)
+                .input('projectName', projectName)
+                .input('createBy', createBy);
+    
+              await request.query(query);
+    
+              query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
+              let response = await request.query(query);
+              // console.log(response.recordset);
+              const TimeSheetId = await response.recordset[0].TimeSheetId
+              query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
+                @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
+              )`;
+              request
+                .input('TimesheetId', sql.Int, TimeSheetId)
+                .input('Latitude', sql.VarChar(50), latitude)
+                .input('Longitude', sql.VarChar(50), longitude)
+                .input('StartTime', dateTime)
+                .input('photoTypeId', photoTypeId)
+                .input('photopath', path)
+                .input('createdBy', createBy)
+    
+              response = await request.query(query);
+              return callback(null, response);
+    
+            }
+            else {
+              // console.log("Need start time to insert");
+              return callback(null, "No Record");
+            }
+    
           }
 
         }
         else {
-          console.log("8 to 8 am", worker_id);
+          // console.log("8 to 8 am", worker_id);
 
 
           query = `SELECT ts.ProjectTypeId
           FROM dbo.TimeManagement tm
           JOIN dbo.TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID
-          WHERE ts.WorkersId =${worker_id} and PhotoTypeId=1 and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE()) AND  DatePART(HOUR,tm.EntryTime)BETWEEN 20 and 23
-          or CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE()+1) 
+          WHERE ts.WorkersId =${worker_id} and PhotoTypeId=1 and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE,dateadd(hh,8,GETUTCDATE())) AND  DatePART(HOUR,tm.EntryTime)BETWEEN 20 and 23
+          or CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE()+1)) 
           and DatePART(HOUR,tm.EntryTime)BETWEEN 0 AND 8`
 
 
@@ -399,9 +433,9 @@ module.exports = {
             startTimelength = response.recordset.length
             // console.log(startTimelength)
 
-            console.log("startime Exists", startTimelength)
+            // console.log("startime Exists", startTimelength)
 
-            console.log("response project", response.recordset[startTimelength - 1].ProjectTypeId,projectTypeId)
+            // console.log("response project", response.recordset[startTimelength - 1].ProjectTypeId,projectTypeId)
             let projecttypeid = response.recordset[startTimelength - 1].ProjectTypeId;  // project id 
             // if (! response.recordset || response.recordset.length == 0) {
             //   console.log("project not exists")
@@ -415,8 +449,8 @@ module.exports = {
             FROM dbo.TimeManagement tm
             JOIN dbo.TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID
             WHERE ts.WorkersId =${worker_id} and PhotoTypeId=2  
-            and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE()) AND DatePART(HOUR,tm.EntryTime)BETWEEN 20 and 23
-            or CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, GETDATE()+1) 
+            and CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE())) AND DatePART(HOUR,tm.EntryTime)BETWEEN 20 and 23
+            or CONVERT(DATE, tm.EntryTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE()+1)) 
             and DatePART(HOUR,tm.EntryTime) BETWEEN 0 AND 8`
 
 
@@ -424,10 +458,10 @@ module.exports = {
 
             if (response.recordset && response.recordset.length > 0) {
               EndTimeLength = response.recordset.length
-              console.log("endtime exists", EndTimeLength)
+              // console.log("endtime exists", EndTimeLength)
 
               if (startTimelength === EndTimeLength) {
-                console.log("even condition start time insert ")
+                // console.log("even condition start time insert ")
                 if (photoTypeId === 1) {
                   query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                       @workers_id,@projectTypeId,@projectName,@createBy
@@ -442,7 +476,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                       @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -461,22 +495,22 @@ module.exports = {
 
                 }
                 else {
-                  console.log("Need start time to insert");
+                  // console.log("Need start time to insert");
                   return callback(null, "No Record");
                 }
 
               }
               else {
-                console.log("odd condition insert end time ")
+                // console.log("odd condition insert end time ")
                 if (projecttypeid != projectTypeId) {
-                  console.log("project not exists")
+                  // console.log("project not exists")
                   return callback(null, "project not Exists")
                 }
                 else {
-                  console.log("project exists")
+                  // console.log("project exists")
                   if (photoTypeId === 3) {
-                    console.log("location change");
-                    console.log("location change can enable");
+                    // console.log("location change");
+                    // console.log("location change can enable");
                     query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                     @workers_id,@projectTypeId,@projectName,@createBy
                     )`;
@@ -490,7 +524,7 @@ module.exports = {
 
                     query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                     let response = await request.query(query);
-                    console.log(response.recordset);
+                    // console.log(response.recordset);
                     const TimeSheetId = await response.recordset[0].TimeSheetId
                     query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                     @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -521,7 +555,7 @@ module.exports = {
 
                     query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                     let response = await request.query(query);
-                    console.log(response.recordset);
+                    // console.log(response.recordset);
                     const TimeSheetId = await response.recordset[0].TimeSheetId
                     query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                       @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -540,23 +574,22 @@ module.exports = {
 
                   }
                   else {
-                    console.log("Need start time to insert");
+                    // console.log("Need start time to insert");
                     return callback(null, "Record exists");
                   }
                 }
               }
             }
             else {
-              console.log("endtime not exists");
+              // console.log("endtime not exists");
               if (projecttypeid != projectTypeId) {
-                console.log("project not exists")
+                // console.log("project not exists")
                 return callback(null, "project not Exists")
               }
               else {
-
-                console.log("project exists")
+                // console.log("project exists")
                 if (photoTypeId === 3) {
-                  console.log("location change can enable");
+                  // console.log("location change can enable");
                   query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
                     @workers_id,@projectTypeId,@projectName,@createBy
                 )`;
@@ -570,7 +603,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                     @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -602,7 +635,7 @@ module.exports = {
 
                   query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
                   let response = await request.query(query);
-                  console.log(response.recordset);
+                  // console.log(response.recordset);
                   const TimeSheetId = await response.recordset[0].TimeSheetId
                   query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
                     @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -626,17 +659,55 @@ module.exports = {
               }
             }
           }
+      
+          // return callback(null, "Time issuse");
           else {
-            console.log("no start time Exists");
-            return callback(null, "Time issuse");
-
+                // console.log("no start time Exists");
+            // console.log(" No Record ! if ph 1 insert");
+            if (photoTypeId === 1) {
+              query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
+                @workers_id,@projectTypeId,@projectName,@createBy
+            )`;
+              request
+                .input('workers_id', sql.Int, worker_id)
+                .input('projectTypeId', sql.Int, projectTypeId)
+                .input('projectName', projectName)
+                .input('createBy', createBy);
+    
+              await request.query(query);
+    
+              query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
+              let response = await request.query(query);
+              // console.log(response.recordset);
+              const TimeSheetId = await response.recordset[0].TimeSheetId
+              query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
+                @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
+              )`;
+              request
+                .input('TimesheetId', sql.Int, TimeSheetId)
+                .input('Latitude', sql.VarChar(50), latitude)
+                .input('Longitude', sql.VarChar(50), longitude)
+                .input('StartTime', dateTime)
+                .input('photoTypeId', photoTypeId)
+                .input('photopath', path)
+                .input('createdBy', createBy)
+    
+              response = await request.query(query);
+              return callback(null, response);
+    
+            }
+            else {
+              // console.log("Need start time to insert");
+              return callback(null, "No Record");
+            }
+    
           }
         }
 
       }
 
       else {
-        console.log(" No Record ! if ph 1 insert")
+        // console.log(" No Record ! if ph 1 insert")
         if (photoTypeId === 1) {
           query = `insert into TimesheetMaster(WorkersId,ProjectTypeId,ProjectName,CreateBy) values (
             @workers_id,@projectTypeId,@projectName,@createBy
@@ -651,7 +722,7 @@ module.exports = {
 
           query = `select Max(TimeSheetID) as TimeSheetId from TimesheetMaster`;
           let response = await request.query(query);
-          console.log(response.recordset);
+          // console.log(response.recordset);
           const TimeSheetId = await response.recordset[0].TimeSheetId
           query = `insert into TimeManagement(TimeSheetID,Latitude,Longitude,EntryTime,PhotoTypeId,PhotoPath,CreateBy) values (
             @TimesheetId,@Latitude,@Longitude,@StartTime,@photoTypeId,@photopath,@createdBy
@@ -670,14 +741,14 @@ module.exports = {
 
         }
         else {
-          console.log("Need start time to insert");
+          // console.log("Need start time to insert");
           return callback(null, "No Record");
         }
 
       }
     }
     catch (err) {
-      console.log(err)
+      // console.log(err)
       return callback(err);
     }
   },
@@ -689,15 +760,15 @@ module.exports = {
       const query = `SELECT * FROM TimeManagement tm
                       JOIN TimesheetMaster ts ON tm.TimeSheetID = ts.TimeSheetID
                       WHERE ts.WorkersId = @workersid
-                        AND CONVERT(DATE, tm.StartTime) = CONVERT(DATE, GETDATE())`;
+                        AND CONVERT(DATE, tm.StartTime) = CONVERT(DATE, dateadd(hh,8,GETUTCDATE()))`;
 
       request.input('workersid', sql.Int, worker_id);
       const response = await request.query(query);
       if (response.recordset && response.recordset.length > 0) {
-        console.log(response.recordset[0]);
+        // console.log(response.recordset[0]);
         return callback(null, response.recordset);
       } else {
-        console.log('No records found');
+        // console.log('No records found');
         return callback(null, []);
       }
     } catch (err) {
